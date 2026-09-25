@@ -4,7 +4,7 @@ import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = os.getenv("8986167849:AAFeaKzOf_qDY4EfSnF_d9hK7ssXmmg-boM")
+TOKEN = os.getenv("8986167849:AAHI9QZeWkJMQ-98EaJB3UZfM6ODA5DWCAI")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "5382801797"))
 
 def init_db():
