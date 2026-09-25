@@ -64,7 +64,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "check_balance":
         balance = get_user_balance(user_id)
         await query.edit_message_text(f"💰 आपका बैलेंस: ₹{balance}")
-            elif data == "deposit":
+    elif data == "deposit":
         await query.edit_message_text(
             f"💳 **To Add Funds / Balance:**\n\n"
             f"1. Send your payment screenshot to Admin.\n"
@@ -121,10 +121,18 @@ async def add_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         target_user, amount = int(context.args[0]), float(context.args[1])
         conn = sqlite3.connect("bot_store.db")
         cursor = conn.cursor()
-        cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, target_user))
+        
+        cursor.execute("SELECT balance FROM users WHERE user_id = ?", (target_user,))
+        row = cursor.fetchone()
+        
+        if not row:
+            cursor.execute("INSERT INTO users (user_id, balance) VALUES (?, ?)", (target_user, amount))
+        else:
+            cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, target_user))
+            
         conn.commit()
         conn.close()
-        await update.message.reply_text(f"✅ User `{target_user}` का बैलेंस ₹{amount} ऐड हुआ।")
+        await update.message.reply_text(f"✅ User `{target_user}` का बैलेंस ₹{amount} ऐड हुआ।", parse_mode="Markdown")
     except Exception:
         await update.message.reply_text("उपयोग: `/addbalance <user_id> <amount>`")
 
@@ -137,7 +145,7 @@ async def add_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cursor.execute("INSERT INTO keys (plan_type, key_value) VALUES (?, ?)", (plan, key_val))
         conn.commit()
         conn.close()
-        await update.message.reply_text(f"✅ Key जोड़ दी गई: `{plan}`")
+        await update.message.reply_text(f"✅ Key जोड़ दी गई: `{plan}`", parse_mode="Markdown")
     except Exception:
         await update.message.reply_text("उपयोग: `/addkey <1_hour|1_day|7_days|1_month> <key_text>`")
 
