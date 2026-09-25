@@ -64,11 +64,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "check_balance":
         balance = get_user_balance(user_id)
         await query.edit_message_text(f"💰 आपका बैलेंस: ₹{balance}")
-    elif data == "deposit":
+        elif data == "deposit":
         await query.edit_message_text(
-            f"💳 **पेमेंट करने के बाद स्क्रीनशॉट और अपनी User ID (`{user_id}`) एडमिन को भेजें।**",
+            f"💳 **To Add Funds / Balance:**\n\n"
+            f"1. Send your payment screenshot to Admin.\n"
+            f"2. Send your **User ID:** `{user_id}`\n\n"
+            f"📩 **Click here to contact Admin:** @KRRISHSELLER1",
             parse_mode="Markdown"
         )
+
     elif data == "buy_menu":
         conn = sqlite3.connect("bot_store.db")
         cursor = conn.cursor()
