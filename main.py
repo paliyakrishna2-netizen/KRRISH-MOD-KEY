@@ -1,8 +1,25 @@
 import os
 import sqlite3
 import asyncio
+from flask import Flask
+from threading import Thread
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+
+# --- Flask Server (Replit को 24x7 जगाए रखने के लिए) ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Krrish Mod Key Bot is Online 24x7!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+# -----------------------------------------------------
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "5382801797"))
@@ -169,6 +186,7 @@ async def add_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Upyog: `/addkey <5_hours|1_day|3_days|7_days|14_days|30_days> <key_text>`")
 
 def main():
+    keep_alive()  # <--- सर्वर को बैकग्राउंड में चालू करने के लिए यहाँ जोड़ दिया है
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("addbalance", add_balance))
