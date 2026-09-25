@@ -20,8 +20,17 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS prices (
                         plan_type TEXT PRIMARY KEY,
                         price REAL)''')
-    plans = [("1_hour", 10), ("1_day", 50), ("7_days", 250), ("1_month", 800)]
-    cursor.executemany("INSERT OR IGNORE INTO prices VALUES (?, ?)", plans)
+    
+    # Naye plans aur unke prices
+    plans = [
+        ("5_hours", 20),
+        ("1_day", 80),
+        ("3_days", 150),
+        ("7_days", 250),
+        ("14_days", 350),
+        ("30_days", 500)
+    ]
+    cursor.executemany("INSERT OR REPLACE INTO prices VALUES (?, ?)", plans)
     conn.commit()
     conn.close()
 
@@ -78,11 +87,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cursor.execute("SELECT plan_type, price FROM prices")
         prices = dict(cursor.fetchall())
         conn.close()
+        
         keyboard = [
-            [InlineKeyboardButton(f"1 Hour - ₹{prices.get('1_hour')}", callback_data="buy_1_hour")],
-            [InlineKeyboardButton(f"1 Day - ₹{prices.get('1_day')}", callback_data="buy_1_day")],
-            [InlineKeyboardButton(f"7 Days - ₹{prices.get('7_days')}", callback_data="buy_7_days")],
-            [InlineKeyboardButton(f"1 Month - ₹{prices.get('1_month')}", callback_data="buy_1_month")]
+            [InlineKeyboardButton(f"5 Hours - ₹{prices.get('5_hours', 20)}/Device", callback_data="buy_5_hours")],
+            [InlineKeyboardButton(f"1 Day - ₹{prices.get('1_day', 80)}/Device", callback_data="buy_1_day")],
+            [InlineKeyboardButton(f"3 Days - ₹{prices.get('3_days', 150)}/Device", callback_data="buy_3_days")],
+            [InlineKeyboardButton(f"7 Days - ₹{prices.get('7_days', 250)}/Device", callback_data="buy_7_days")],
+            [InlineKeyboardButton(f"14 Days - ₹{prices.get('14_days', 350)}/Device", callback_data="buy_14_days")],
+            [InlineKeyboardButton(f"30 Days - ₹{prices.get('30_days', 500)}/Device", callback_data="buy_30_days")]
         ]
         await query.edit_message_text("🛒 Apna plan chune:", reply_markup=InlineKeyboardMarkup(keyboard))
     elif data.startswith("buy_"):
@@ -90,7 +102,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         conn = sqlite3.connect("bot_store.db")
         cursor = conn.cursor()
         cursor.execute("SELECT price FROM prices WHERE plan_type = ?", (plan,))
-        price = cursor.fetchone()[0]
+        row = cursor.fetchone()
+        
+        if not row:
+            await query.edit_message_text("❌ Ye plan available nahi hai.")
+            conn.close()
+            return
+            
+        price = row[0]
         balance = get_user_balance(user_id)
 
         if balance < price:
@@ -147,7 +166,7 @@ async def add_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
         conn.close()
         await update.message.reply_text(f"✅ Key jod di gayi: `{plan}`", parse_mode="Markdown")
     except Exception:
-        await update.message.reply_text("Upyog: `/addkey <1_hour|1_day|7_days|1_month> <key_text>`")
+        await update.message.reply_text("Upyog: `/addkey <5_hours|1_day|3_days|7_days|14_days|30_days> <key_text>`")
 
 def main():
     app = Application.builder().token(TOKEN).build()
