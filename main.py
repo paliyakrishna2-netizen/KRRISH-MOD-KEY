@@ -5,7 +5,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 TOKEN = os.getenv("8986167849:AAFeaKzOf_qDY4EfSnF_d9hK7ssXmmg-boM")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+ADMIN_ID = int(os.getenv("ADMIN_ID", "5382801797"))
 
 def init_db():
     conn = sqlite3.connect("bot_store.db")
