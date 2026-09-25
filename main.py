@@ -50,7 +50,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📲 Deposit / Add Funds", callback_data="deposit")]
     ]
     await update.message.reply_text(
-        f"👋 नमस्ते!\n\n🆔 ID: `{user_id}`\n💰 Balance: ₹{balance}",
+        f"👋 Namaste!\n\n🆔 ID: `{user_id}`\n💰 Balance: ₹{balance}",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown"
     )
@@ -63,13 +63,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "check_balance":
         balance = get_user_balance(user_id)
-        await query.edit_message_text(f"💰 आपका बैलेंस: ₹{balance}")
+        await query.edit_message_text(f"💰 Aapka Balance: ₹{balance}")
     elif data == "deposit":
         await query.edit_message_text(
             f"💳 **To Add Funds / Balance:**\n\n"
-            f"1. Send your payment screenshot to Admin.\n"
-            f"2. Send your **User ID:** `{user_id}`\n\n"
-            f"📩 **Click here to contact Admin:** @KRRISHSELLER1",
+            f"1. Payment karne ke baad screenshot Admin ko bheje.\n"
+            f"2. Apni **User ID:** `{user_id}` bhi bheje.\n\n"
+            f"📩 **Admin se contact karne ke liye yahan click kare:** @KRRISHSELLER1",
             parse_mode="Markdown"
         )
     elif data == "buy_menu":
@@ -84,7 +84,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(f"7 Days - ₹{prices.get('7_days')}", callback_data="buy_7_days")],
             [InlineKeyboardButton(f"1 Month - ₹{prices.get('1_month')}", callback_data="buy_1_month")]
         ]
-        await query.edit_message_text("🛒 अपना प्लान चुनें:", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.edit_message_text("🛒 Apna plan chune:", reply_markup=InlineKeyboardMarkup(keyboard))
     elif data.startswith("buy_"):
         plan = data.replace("buy_", "")
         conn = sqlite3.connect("bot_store.db")
@@ -94,7 +94,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         balance = get_user_balance(user_id)
 
         if balance < price:
-            await query.edit_message_text(f"❌ पर्याप्त बैलेंस नहीं है। कीमत: ₹{price}, बैलेंस: ₹{balance}")
+            await query.edit_message_text(f"❌ Paryaapt balance nahi hai. Keemat: ₹{price}, Balance: ₹{balance}")
             conn.close()
             return
 
@@ -102,7 +102,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         key_data = cursor.fetchone()
 
         if not key_data:
-            await query.edit_message_text("⚠️ यह प्लान अभी आउट ऑफ स्टॉक है।")
+            await query.edit_message_text("⚠️ Yeh plan abhi out of stock hai.")
             conn.close()
             return
 
@@ -113,7 +113,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         conn.commit()
         conn.close()
 
-        await query.edit_message_text(f"✅ **खरीद सफल रही!**\n\n🔑 Key: `{key_value}`\n💰 शेष बैलेंस: ₹{new_balance}", parse_mode="Markdown")
+        await query.edit_message_text(f"✅ **Khareed safal rahi!**\n\n🔑 Key: `{key_value}`\n💰 Shesh Balance: ₹{new_balance}", parse_mode="Markdown")
 
 async def add_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID: return
@@ -132,9 +132,9 @@ async def add_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
         conn.commit()
         conn.close()
-        await update.message.reply_text(f"✅ User `{target_user}` का बैलेंस ₹{amount} ऐड हुआ।", parse_mode="Markdown")
+        await update.message.reply_text(f"✅ User `{target_user}` ka balance ₹{amount} add ho gaya.", parse_mode="Markdown")
     except Exception:
-        await update.message.reply_text("उपयोग: `/addbalance <user_id> <amount>`")
+        await update.message.reply_text("Upyog: `/addbalance <user_id> <amount>`")
 
 async def add_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID: return
@@ -145,9 +145,9 @@ async def add_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cursor.execute("INSERT INTO keys (plan_type, key_value) VALUES (?, ?)", (plan, key_val))
         conn.commit()
         conn.close()
-        await update.message.reply_text(f"✅ Key जोड़ दी गई: `{plan}`", parse_mode="Markdown")
+        await update.message.reply_text(f"✅ Key jod di gayi: `{plan}`", parse_mode="Markdown")
     except Exception:
-        await update.message.reply_text("उपयोग: `/addkey <1_hour|1_day|7_days|1_month> <key_text>`")
+        await update.message.reply_text("Upyog: `/addkey <1_hour|1_day|7_days|1_month> <key_text>`")
 
 def main():
     app = Application.builder().token(TOKEN).build()
